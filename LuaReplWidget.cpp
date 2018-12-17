@@ -5,6 +5,9 @@
 #include <QTextBlock>
 #include <QTextCursor>
 
+#include <fstream>
+#include <sstream>
+
 namespace
 {
   QString const Prompt1 = QStringLiteral(">>> ");
@@ -25,6 +28,8 @@ private:
   void prompt(std::string const & message);
   void addHistory(std::string const & line);
   void restore(std::string const & line = {});
+  void saveHistory(std::string const & filename);
+  void loadHistory(std::string const & filename);
 
   using HistoryContainer = std::vector<std::string>;
   using HistoryIndex = std::size_t;
@@ -46,7 +51,10 @@ LuaReplWidgetImpl::LuaReplWidgetImpl(sol::state & lua_, QPlainTextEdit & textEdi
   , multiline(false)
 {
   prompt();
+
   lua.set_function("print", &LuaReplWidgetImpl::print, this);
+  lua.set_function("save_history", &LuaReplWidgetImpl::saveHistory, this);
+  lua.set_function("load_history", &LuaReplWidgetImpl::loadHistory, this);
 }
 
 bool LuaReplWidgetImpl::keyPressEvent(QKeyEvent *e)
@@ -160,8 +168,19 @@ bool LuaReplWidgetImpl::keyPressEvent(QKeyEvent *e)
 
 void LuaReplWidgetImpl::print(sol::variadic_args & args)
 {
-  for(auto & arg : args)
-    textEdit.appendPlainText(QString::fromStdString(arg));
+  if(0 < args.size())
+  {
+    std::stringstream stream;
+    auto it = args.cbegin();
+    auto end = args.cend();
+
+    stream << it->as<std::string>();
+
+    while(++it != end)
+      stream << '\t' << it->as<std::string>();
+
+    textEdit.appendPlainText(QString::fromStdString(stream.str()));
+  }
 }
 
 void LuaReplWidgetImpl::prompt()
@@ -201,6 +220,23 @@ void LuaReplWidgetImpl::restore(std::string const & input)
   cursor.select(QTextCursor::BlockUnderCursor);
   cursor.removeSelectedText();
   textEdit.appendPlainText(line);
+}
+
+void LuaReplWidgetImpl::saveHistory(std::string const & filename)
+{
+  std::ofstream fout(filename);
+
+  for(auto line : history)
+    fout << line << std::endl;
+}
+
+void LuaReplWidgetImpl::loadHistory(std::string const & filename)
+{
+  std::ifstream fin(filename);
+  std::string line;
+
+  while(std::getline(fin, line))
+    history.push_back(line);
 }
 
 LuaReplWidget::LuaReplWidget(sol::state & lua_, QWidget *parent)

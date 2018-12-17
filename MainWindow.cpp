@@ -14,9 +14,21 @@
 #include <QLabel>
 #include <QVBoxLayout>
 
+namespace
+{
+  sol::state * create_interpreter()
+  {
+    auto lua = new sol::state;
+
+    lua->open_libraries();
+
+    return lua;
+  }
+}
+
 MainWindow::MainWindow()
   : SettingsWindow(QStringLiteral("LuaQtHotLoad"))
-  , lua(new sol::state)
+  , lua(create_interpreter())
   , watcher(new QFileSystemWatcher(this))
   , label(new QLabel(this))
   , replWidget(new LuaReplWidget(*lua, this))
