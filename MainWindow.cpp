@@ -1,5 +1,7 @@
 #include "MainWindow.h"
 
+#include "LuaReplWidget.h"
+
 #include "sol.hpp"
 
 #include <QAction>
@@ -10,14 +12,22 @@
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QLabel>
+#include <QVBoxLayout>
 
 MainWindow::MainWindow()
   : SettingsWindow(QStringLiteral("LuaQtHotLoad"))
-  , watcher(new QFileSystemWatcher(this))
-  , label(new QLabel)
   , lua(new sol::state)
+  , watcher(new QFileSystemWatcher(this))
+  , label(new QLabel(this))
+  , replWidget(new LuaReplWidget(*lua, this))
 {
-  setCentralWidget(label);
+  auto widget = new QWidget;
+  auto layout = new QVBoxLayout;
+
+  layout->addWidget(label);
+  layout->addWidget(replWidget);
+  widget->setLayout(layout);
+  setCentralWidget(widget);
 
   auto fileMenu = menuBar()->addMenu("&File");
   fileMenu->addAction("&Open", this, &MainWindow::onOpen);

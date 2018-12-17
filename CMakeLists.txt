@@ -27,6 +27,8 @@ set(LuaQtAutoHotLoad_SRCS
     main.cpp
     SettingsWindow.h
     SettingsWindow.cpp
+    LuaReplWidget.h
+    LuaReplWidget.cpp
     sol.hpp
 )
 

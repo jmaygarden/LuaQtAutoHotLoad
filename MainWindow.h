@@ -24,7 +24,8 @@ private:
 
   void run(QString const & path);
 
+  sol::state * lua;
   QFileSystemWatcher * watcher;
   QLabel * label;
-  sol::state * lua;
+  QWidget * replWidget;
 };

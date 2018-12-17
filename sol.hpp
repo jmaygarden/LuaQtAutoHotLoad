@@ -10359,8 +10359,8 @@ namespace stack {
 	struct pusher<detail::as_value_tag<T>> {
 		template <typename F, typename... Args>
 		static int push_fx(lua_State* L, F&& f, Args&&... args) {
-			// Basically, we store all user-data like this:
-			// If it's a movable/copyable value (no std::ref(x)), then we store the pointer to the new
+			// Basically, we addHistory all user-data like this:
+			// If it's a movable/copyable value (no std::ref(x)), then we addHistory the pointer to the new
 			// data in the first sizeof(T*) bytes, and then however many bytes it takes to
 			// do the actual object. Things that are std::ref or plain T* are stored as
 			// just the sizeof(T*), and nothing else.
@@ -13931,7 +13931,7 @@ namespace function_detail {
 			// Layout:
 			// idx 1...n: verbatim data of member function pointer
 			// idx n + 1: is the object's void pointer
-			// We don't need to store the size, because the other side is templated
+			// We don't need to addHistory the size, because the other side is templated
 			// with the same member function pointer type
 			auto memberdata = stack::stack_detail::get_as_upvalues<function_type>(L);
 			auto objdata = stack::stack_detail::get_as_upvalues<T*>(L, memberdata.second);
@@ -13964,7 +13964,7 @@ namespace function_detail {
 			// Layout:
 			// idx 1...n: verbatim data of member variable pointer
 			// idx n + 1: is the object's void pointer
-			// We don't need to store the size, because the other side is templated
+			// We don't need to addHistory the size, because the other side is templated
 			// with the same member function pointer type
 			auto memberdata = stack::stack_detail::get_as_upvalues<function_type>(L);
 			auto objdata = stack::stack_detail::get_as_upvalues<T*>(L, memberdata.second);
@@ -14004,7 +14004,7 @@ namespace function_detail {
 			// Layout:
 			// idx 1...n: verbatim data of member variable pointer
 			// idx n + 1: is the object's void pointer
-			// We don't need to store the size, because the other side is templated
+			// We don't need to addHistory the size, because the other side is templated
 			// with the same member function pointer type
 			auto memberdata = stack::stack_detail::get_as_upvalues<function_type>(L);
 			auto objdata = stack::stack_detail::get_as_upvalues<T*>(L, memberdata.second);
